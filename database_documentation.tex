@@ -1,0 +1,90 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{parskip}
+\usepackage{noto}
+
+\begin{document}
+
+\title{E-commerce Admin API Database Documentation}
+\author{}
+\date{May 25, 2025}
+\maketitle
+
+\section{Introduction}
+This document describes the database schema for the E-commerce Admin API, designed to support sales analysis, revenue tracking, inventory management, and product registration. The database uses MySQL and is normalized to the third normal form (3NF) to ensure data consistency and minimize redundancy.
+
+\section{Database Schema}
+
+\subsection{Tables}
+
+\begin{table}[h]
+\centering
+\caption{Tables and Their Purpose}
+\begin{tabular}{ll}
+\toprule
+\textbf{Table} & \textbf{Purpose} \\
+\midrule
+categories & Stores product categories (e.g., Electronics, Clothing). \\
+products & Stores product details (e.g., name, price, category). \\
+sales & Records sales transactions with product, quantity, and date. \\
+inventory & Tracks current inventory levels and updates. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Table Details}
+
+\subsubsection{categories}
+\begin{itemize}
+    \item \textbf{id}: Integer, Primary Key, Auto-incremented. Unique identifier for each category.
+    \item \textbf{name}: VARCHAR(100), Not Null. Name of the category (e.g., Electronics).
+    \item \textbf{Indexes}: idx\_category\_name on name for faster lookups.
+\end{itemize}
+
+\subsubsection{products}
+\begin{itemize}
+    \item \textbf{id}: Integer, Primary Key, Auto-incremented. Unique identifier for each product.
+    \item \textbf{name}: VARCHAR(255), Not Null. Product name.
+    \item \textbf{category\_id}: Integer, Foreign Key referencing categories(id). Links product to its category.
+    \item \textbf{price}: DECIMAL(10,2), Not Null. Product price.
+    \item \textbf{Indexes}: idx\_product\_category on category\_id for efficient joins.
+\end{itemize}
+
+\subsubsection{sales}
+\begin{itemize}
+    \item \textbf{id}: Integer, Primary Key, Auto-incremented. Unique identifier for each sale.
+    \item \textbf{product\_id}: Integer, Foreign Key referencing products(id). Links sale to a product.
+    \item \textbf{quantity}: Integer, Not Null. Number of units sold.
+    \item \textbf{sale\_date}: DATETIME, Not Null. Date and time of the sale.
+    \item \textbf{total\_amount}: DECIMAL(10,2), Not Null. Total sale amount (price $\times$ quantity).
+    \item \textbf{Indexes}: idx\_sale\_date on sale\_date, idx\_sale\_product on product\_id for efficient filtering.
+\end{itemize}
+
+\subsubsection{inventory}
+\begin{itemize}
+    \item \textbf{id}: Integer, Primary Key, Auto-incremented. Unique identifier for each inventory record.
+    \item \textbf{product\_id}: Integer, Foreign Key referencing products(id). Links inventory to a product.
+    \item \textbf{quantity}: Integer, Not Null. Current stock level.
+    \item \textbf{last\_updated}: DATETIME, Not Null. Timestamp of last inventory update.
+    \item \textbf{Indexes}: idx\_inventory\_product on product\_id for efficient queries.
+\end{itemize}
+
+\section{Relationships}
+\begin{itemize}
+    \item \textbf{products to categories}: Many-to-one. Each product belongs to one category (via category\_id).
+    \item \textbf{sales to products}: Many-to-one. Each sale is associated with one product (via product\_id).
+    \item \textbf{inventory to products}: One-to-one. Each product has one inventory record (via product\_id).
+\end{itemize}
+
+\section{Optimization}
+\begin{itemize}
+    \item Indexes are added on frequently queried columns (e.g., sale\_date, product\_id) to optimize performance.
+    \item The schema is normalized to 3NF to eliminate redundancy and ensure data integrity.
+    \item Foreign keys enforce referential integrity.
+\end{itemize}
+
+\end{document}
